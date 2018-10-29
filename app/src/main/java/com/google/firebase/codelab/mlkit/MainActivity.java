@@ -311,7 +311,44 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     private void runModelInference() {
-        // Replace with code from the codelab to run inference using your custom model.
+        if (mInterpreter == null) {
+            Log.e(TAG, "Image classifier has not been initialized; Skipped.");
+            return;
+        }
+        // Create input data.
+        ByteBuffer imgData = convertBitmapToByteBuffer(mSelectedImage, mSelectedImage.getWidth(),
+                mSelectedImage.getHeight());
+
+        try {
+            FirebaseModelInputs inputs = new FirebaseModelInputs.Builder().add(imgData).build();
+            // Here's where the magic happens!!
+            mInterpreter
+                    .run(inputs, mDataOptions)
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            e.printStackTrace();
+                            showToast("Error running model inference");
+                        }
+                    })
+                    .continueWith(
+                            new Continuation<FirebaseModelOutputs, List<String>>() {
+                                @Override
+                                public List<String> then(Task<FirebaseModelOutputs> task) {
+                                    byte[][] labelProbArray = task.getResult()
+                                            .<byte[][]>getOutput(0);
+                                    List<String> topLabels = getTopLabels(labelProbArray);
+                                    mGraphicOverlay.clear();
+                                    GraphicOverlay.Graphic labelGraphic = new LabelGraphic
+                                            (mGraphicOverlay, topLabels);
+                                    mGraphicOverlay.add(labelGraphic);
+                                    return topLabels;
+                                }
+                            });
+        } catch (FirebaseMLException e) {
+            e.printStackTrace();
+            showToast("Error running model inference");
+        }
     }
 
     private void runCloudTextRecognition() {

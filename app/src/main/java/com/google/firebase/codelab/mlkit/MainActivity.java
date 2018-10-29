@@ -104,6 +104,16 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private static final int DIM_PIXEL_SIZE = 3;
     private static final int DIM_IMG_SIZE_X = 224;
     private static final int DIM_IMG_SIZE_Y = 224;
+
+    /**
+     * An instance of the driver class to run model inference with Firebase.
+     */
+    private FirebaseModelInterpreter mInterpreter;
+    /**
+     * Data configuration of input & output data of model.
+     */
+    private FirebaseModelInputOutputOptions mDataOptions;
+    
     /**
      * Labels corresponding to the output of the vision model.
      */

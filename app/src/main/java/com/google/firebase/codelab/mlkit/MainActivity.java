@@ -244,7 +244,18 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     private void processFaceContourDetectionResult(List<FirebaseVisionFace> faces) {
-        // Replace with code from the codelab to process the face contour detection result.
+        // Task completed successfully
+        if (faces.size() == 0) {
+            showToast("No face found");
+            return;
+        }
+        mGraphicOverlay.clear();
+        for (int i = 0; i < faces.size(); ++i) {
+            FirebaseVisionFace face = faces.get(i);
+            FaceContourGraphic faceGraphic = new FaceContourGraphic(mGraphicOverlay);
+            mGraphicOverlay.add(faceGraphic);
+            faceGraphic.updateFace(face);
+        }
     }
 
     private void initCustomModel() {
